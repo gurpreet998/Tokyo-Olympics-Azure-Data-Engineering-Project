@@ -68,7 +68,7 @@ Created a storage account with two containers:
 - Dashboard was intentionally kept simple, as the primary focus of this project is **data engineering**, not BI storytelling
 
 ## Dashboard Preview
-  ![Dashboard Preview](Images/Dashboard.png)
+  ![Dashboard Preview](Images/Azure Dashboard.png)
 
 ---
 
