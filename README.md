@@ -27,7 +27,7 @@ This project focuses primarily on **data engineering concepts**, including:
 
 ## 🏗️ Architecture
 
-(images/Architecture.png)
+![](images/Architecture.png)
 
 ---
 
