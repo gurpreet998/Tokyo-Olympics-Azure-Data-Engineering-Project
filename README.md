@@ -102,9 +102,9 @@ Tokyo-Olympics-Azure-Data-Engineering-Project/
 ├── sql/
 │   └── synapse_script.sql
 │
-├── images/
-│   ├── architecture.png
-│   └── dashboard.png
+├── Images/
+│   ├── Architecture.png
+│   └── Dashboard.png
 │
 ├── README.md
 
