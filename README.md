@@ -25,9 +25,9 @@ This project focuses primarily on **data engineering concepts**, including:
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Project Architecture
 
-![Project Architecture](images/Architecture.png)
+![Project Architecture](Images/Architecture.png)
 
 ---
 
@@ -67,7 +67,8 @@ Created a storage account with two containers:
 - Built a **lightweight one-page reporting dashboard**
 - Dashboard was intentionally kept simple, as the primary focus of this project is **data engineering**, not BI storytelling
 
-  ![Dashboard](Images/Dashboard)
+## Dashboard Preview
+  ![Dashboard Preview](Images/Dashboard.png)
 
 ---
 
