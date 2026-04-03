@@ -1,0 +1,328 @@
+/* =========================================================
+   TOKYO OLYMPICS DATA ANALYSIS - SYNAPSE SQL SCRIPT
+   =========================================================
+   Tables Used:
+   - athletes
+   - coaches
+   - teams
+   - medals
+   - entriesgender
+   ========================================================= */
+
+
+/* =========================================================
+   1. TOTAL ATHLETES BY COUNTRY
+   ========================================================= */
+SELECT
+    Country,
+    COUNT(*) AS athlete_count
+FROM athletes
+GROUP BY Country
+ORDER BY athlete_count DESC;
+
+
+
+/* =========================================================
+   2. TOTAL ATHLETES BY DISCIPLINE
+   ========================================================= */
+SELECT
+    Discipline,
+    COUNT(*) AS athlete_count
+FROM athletes
+GROUP BY Discipline
+ORDER BY athlete_count DESC;
+
+
+
+/* =========================================================
+   3. TOTAL COACHES BY COUNTRY
+   ========================================================= */
+SELECT
+    Country,
+    COUNT(*) AS coach_count
+FROM coaches
+GROUP BY Country
+ORDER BY coach_count DESC;
+
+
+
+/* =========================================================
+   4. TOTAL COACHES BY DISCIPLINE
+   ========================================================= */
+SELECT
+    Discipline,
+    COUNT(*) AS coach_count
+FROM coaches
+GROUP BY Discipline
+ORDER BY coach_count DESC;
+
+
+
+/* =========================================================
+   5. TOTAL TEAMS BY COUNTRY
+   ========================================================= */
+SELECT
+    Country,
+    COUNT(*) AS team_count
+FROM teams
+GROUP BY Country
+ORDER BY team_count DESC;
+
+
+
+/* =========================================================
+   6. TOTAL TEAMS BY DISCIPLINE
+   ========================================================= */
+SELECT
+    Discipline,
+    COUNT(*) AS team_count
+FROM teams
+GROUP BY Discipline
+ORDER BY team_count DESC;
+
+
+
+/* =========================================================
+   7. MEDAL SUMMARY BY COUNTRY
+   ========================================================= */
+SELECT
+    TeamCountry AS Country,
+    Gold,
+    Silver,
+    Bronze,
+    Total,
+    Rank,
+    [Rank by Total]
+FROM medals
+ORDER BY Total DESC;
+
+
+
+/* =========================================================
+   8. TOP 10 COUNTRIES BY GOLD MEDALS
+   ========================================================= */
+SELECT TOP 10
+    TeamCountry AS Country,
+    Gold
+FROM medals
+ORDER BY Gold DESC;
+
+
+
+/* =========================================================
+   9. TOP 10 COUNTRIES BY TOTAL MEDALS
+   ========================================================= */
+SELECT TOP 10
+    TeamCountry AS Country,
+    Total
+FROM medals
+ORDER BY Total DESC;
+
+
+
+/* =========================================================
+   10. GENDER PARTICIPATION BY DISCIPLINE
+   ========================================================= */
+SELECT
+    Discipline,
+    Female,
+    Male,
+    Total
+FROM entriesgender
+ORDER BY Total DESC;
+
+
+
+/* =========================================================
+   11. FEMALE PARTICIPATION PERCENTAGE
+   ========================================================= */
+SELECT
+    Discipline,
+    Female,
+    Male,
+    Total,
+    ROUND((Female * 100.0) / Total, 2) AS female_percentage
+FROM entriesgender
+ORDER BY female_percentage DESC;
+
+
+
+/* =========================================================
+   12. MALE PARTICIPATION PERCENTAGE
+   ========================================================= */
+SELECT
+    Discipline,
+    Female,
+    Male,
+    Total,
+    ROUND((Male * 100.0) / Total, 2) AS male_percentage
+FROM entriesgender
+ORDER BY male_percentage DESC;
+
+
+
+/* =========================================================
+   13. COUNTRY PARTICIPATION VS MEDALS
+   ========================================================= */
+SELECT
+    a.Country,
+    COUNT(a.PersonName) AS athlete_count,
+    ISNULL(m.Gold, 0) AS Gold,
+    ISNULL(m.Silver, 0) AS Silver,
+    ISNULL(m.Bronze, 0) AS Bronze,
+    ISNULL(m.Total, 0) AS Total_Medals
+FROM athletes a
+LEFT JOIN medals m
+    ON a.Country = m.TeamCountry
+GROUP BY
+    a.Country,
+    m.Gold,
+    m.Silver,
+    m.Bronze,
+    m.Total
+ORDER BY athlete_count DESC;
+
+
+
+/* =========================================================
+   14. ATHLETE VS COACH COUNT BY COUNTRY
+   ========================================================= */
+SELECT
+    a.Country,
+    COUNT(DISTINCT a.PersonName) AS athlete_count,
+    COUNT(DISTINCT c.Name) AS coach_count
+FROM athletes a
+LEFT JOIN coaches c
+    ON a.Country = c.Country
+GROUP BY a.Country
+ORDER BY athlete_count DESC;
+
+
+
+/* =========================================================
+   15. COUNTRY OVERALL SUMMARY
+   ========================================================= */
+SELECT
+    COALESCE(a.Country, c.Country, t.Country, m.TeamCountry) AS Country,
+    ISNULL(a.athlete_count, 0) AS athlete_count,
+    ISNULL(c.coach_count, 0) AS coach_count,
+    ISNULL(t.team_count, 0) AS team_count,
+    ISNULL(m.Gold, 0) AS Gold,
+    ISNULL(m.Silver, 0) AS Silver,
+    ISNULL(m.Bronze, 0) AS Bronze,
+    ISNULL(m.Total, 0) AS Total_Medals
+FROM
+(
+    SELECT Country, COUNT(*) AS athlete_count
+    FROM athletes
+    GROUP BY Country
+) a
+FULL OUTER JOIN
+(
+    SELECT Country, COUNT(*) AS coach_count
+    FROM coaches
+    GROUP BY Country
+) c
+    ON a.Country = c.Country
+FULL OUTER JOIN
+(
+    SELECT Country, COUNT(*) AS team_count
+    FROM teams
+    GROUP BY Country
+) t
+    ON COALESCE(a.Country, c.Country) = t.Country
+FULL OUTER JOIN medals m
+    ON COALESCE(a.Country, c.Country, t.Country) = m.TeamCountry
+ORDER BY Total_Medals DESC;
+
+
+
+/* =========================================================
+   16. DISCIPLINE REPRESENTATION (ATHLETES + COACHES + TEAMS)
+   ========================================================= */
+SELECT
+    Discipline,
+    SUM(athlete_count) AS athlete_count,
+    SUM(coach_count) AS coach_count,
+    SUM(team_count) AS team_count
+FROM
+(
+    SELECT Discipline, COUNT(*) AS athlete_count, 0 AS coach_count, 0 AS team_count
+    FROM athletes
+    GROUP BY Discipline
+
+    UNION ALL
+
+    SELECT Discipline, 0, COUNT(*), 0
+    FROM coaches
+    GROUP BY Discipline
+
+    UNION ALL
+
+    SELECT Discipline, 0, 0, COUNT(*)
+    FROM teams
+    GROUP BY Discipline
+) x
+GROUP BY Discipline
+ORDER BY athlete_count DESC;
+
+
+
+/* =========================================================
+   17. TOP FEMALE DOMINATED SPORTS
+   ========================================================= */
+SELECT TOP 10
+    Discipline,
+    Female,
+    Total,
+    ROUND((Female * 100.0) / Total, 2) AS female_percentage
+FROM entriesgender
+ORDER BY female_percentage DESC;
+
+
+
+/* =========================================================
+   18. TOP MALE DOMINATED SPORTS
+   ========================================================= */
+SELECT TOP 10
+    Discipline,
+    Male,
+    Total,
+    ROUND((Male * 100.0) / Total, 2) AS male_percentage
+FROM entriesgender
+ORDER BY male_percentage DESC;
+
+
+
+/* =========================================================
+   19. HIGH PARTICIPATION BUT LOW MEDALS
+   ========================================================= */
+SELECT
+    a.Country,
+    COUNT(a.PersonName) AS athlete_count,
+    ISNULL(m.Total, 0) AS total_medals,
+    CASE
+        WHEN COUNT(a.PersonName) = 0 THEN 0
+        ELSE ROUND(ISNULL(m.Total, 0) * 1.0 / COUNT(a.PersonName), 2)
+    END AS medals_per_athlete
+FROM athletes a
+LEFT JOIN medals m
+    ON a.Country = m.TeamCountry
+GROUP BY a.Country, m.Total
+ORDER BY athlete_count DESC, medals_per_athlete ASC;
+
+
+
+/* =========================================================
+   20. MEDAL EFFICIENCY (PER 100 ATHLETES)
+   ========================================================= */
+SELECT
+    a.Country,
+    COUNT(a.PersonName) AS athlete_count,
+    ISNULL(m.Total, 0) AS total_medals,
+    ROUND(ISNULL(m.Total, 0) * 100.0 / COUNT(a.PersonName), 2) AS medals_per_100_athletes
+FROM athletes a
+LEFT JOIN medals m
+    ON a.Country = m.TeamCountry
+GROUP BY a.Country, m.Total
+ORDER BY medals_per_100_athletes DESC;
