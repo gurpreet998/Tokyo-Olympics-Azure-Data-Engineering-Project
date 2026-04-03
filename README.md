@@ -67,6 +67,8 @@ Created a storage account with two containers:
 - Built a **lightweight one-page reporting dashboard**
 - Dashboard was intentionally kept simple, as the primary focus of this project is **data engineering**, not BI storytelling
 
+  ![Dashboard]()
+
 ---
 
 ## 📂 Dataset Used
@@ -97,7 +99,7 @@ Tokyo-Olympics-Azure-Data-Engineering-Project/
 │   └── Spark Code.ipynb
 │
 ├── sql/
-│   └── synapse_sql_script.sql
+│   └── synapse_script.sql
 │
 ├── images/
 │   ├── architecture.png
